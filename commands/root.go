@@ -39,7 +39,7 @@ func Listkms(region string, accessKey string, secretKey string, env string, cros
 	kmsClient := client.GetClient(region, crossAccountRoleArn, accessKey, secretKey, externalId)
 
 	kmsRequest := &kms.ListKeysInput{}
-	kmsResponse, err := kmsClient.Listkms(kmsRequest)
+	kmsResponse, err := kmsClient.ListKeys(kmsRequest)
 	if err != nil {
 		log.Fatalln("Error: ", err)
 	}
