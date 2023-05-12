@@ -5,6 +5,7 @@ import (
 
 	"github.com/Appkube-awsx/awsx-kms/authenticater"
 	"github.com/Appkube-awsx/awsx-kms/client"
+	"github.com/Appkube-awsx/awsx-kms/commands/kmscmd"
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/spf13/cobra"
 )
@@ -62,9 +63,8 @@ func Execute() {
 }
 
 func init() {
-	// AwsxKmsCmd.AddCommand(kmscmd.GetEC2ConfigCmd)
-	// AwsxKmsCmd.AddCommand(kmscmd.GetCostDataCmd)
-	// AwsxKmsCmd.AddCommand(kmscmd.GetCostSpikeCmd)
+	AwsxKmsCmd.AddCommand(kmscmd.GetConfigDataCmd)
+
 	AwsxKmsCmd.PersistentFlags().String("vaultUrl", "", "vault end point")
 	AwsxKmsCmd.PersistentFlags().String("accountId", "", "aws account number")
 	AwsxKmsCmd.PersistentFlags().String("zone", "", "aws region")
@@ -75,7 +75,3 @@ func init() {
 	AwsxKmsCmd.PersistentFlags().String("env", "", "env")
 
 }
-
-// cmd used to get list of EC2 instance's :
-
-//  ./awsx-ec2 --zone=us-east-1 --accessKey=<6f> --secretKey=<> --crossAccountRoleArn=<>  --externalId=<>
