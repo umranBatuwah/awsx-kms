@@ -3,20 +3,15 @@ package authenticater
 import (
 	"log"
 
+	"github.com/Appkube-awsx/awsx-common/client"
 	"github.com/Appkube-awsx/awsx-kms/vault"
 	"github.com/spf13/cobra"
 )
 
-var (
-	VaultUrl            string
-	AccountId           string
-	Region              string
-	AcKey               string
-	SecKey              string
-	CrossAccountRoleArn string
-	ExternalId          string
-)
+// ClientAuth for storing auth data
+var ClientAuth client.Auth
 
+// AuthenticateData -> For account validation
 func AuthenticateData(vaultUrl string, accountNo string, region string, acKey string, secKey string, crossAccountRoleArn string, externalId string) bool {
 
 	if vaultUrl != "" && accountNo != "" {
@@ -44,17 +39,17 @@ func AuthenticateData(vaultUrl string, accountNo string, region string, acKey st
 	}
 }
 
+// ChildCommandAuth -> For validation of child command
 func ChildCommandAuth(cmd *cobra.Command) bool {
 
-	VaultUrl = cmd.Parent().PersistentFlags().Lookup("vaultUrl").Value.String()
-	AccountId = cmd.Parent().PersistentFlags().Lookup("accountId").Value.String()
-	Region = cmd.Parent().PersistentFlags().Lookup("zone").Value.String()
-	AcKey = cmd.Parent().PersistentFlags().Lookup("accessKey").Value.String()
-	SecKey = cmd.Parent().PersistentFlags().Lookup("secretKey").Value.String()
-	CrossAccountRoleArn = cmd.Parent().PersistentFlags().Lookup("crossAccountRoleArn").Value.String()
-	ExternalId = cmd.Parent().PersistentFlags().Lookup("externalId").Value.String()
-
-	authFlag := AuthenticateData(VaultUrl, AccountId, Region, AcKey, SecKey, CrossAccountRoleArn, ExternalId)
+	ClientAuth = client.Auth{
+		cmd.Parent().PersistentFlags().Lookup("zone").Value.String(),
+		cmd.Parent().PersistentFlags().Lookup("crossAccountRoleArn").Value.String(),
+		cmd.Parent().PersistentFlags().Lookup("accessKey").Value.String(),
+		cmd.Parent().PersistentFlags().Lookup("secretKey").Value.String(),
+		cmd.Parent().PersistentFlags().Lookup("externalId").Value.String(),
+	}
+	authFlag := AuthenticateData("", "", ClientAuth.Region, ClientAuth.AccessKey, ClientAuth.SecretKey, ClientAuth.CrossAccountRoleArn, ClientAuth.ExternalId)
 
 	return authFlag
 }
@@ -62,15 +57,26 @@ func ChildCommandAuth(cmd *cobra.Command) bool {
 // RootCommandAuth -> For validation of parent command
 func RootCommandAuth(cmd *cobra.Command) bool {
 
-	VaultUrl = cmd.PersistentFlags().Lookup("vaultUrl").Value.String()
-	AccountId = cmd.PersistentFlags().Lookup("accountId").Value.String()
-	Region = cmd.PersistentFlags().Lookup("zone").Value.String()
-	AcKey = cmd.PersistentFlags().Lookup("accessKey").Value.String()
-	SecKey = cmd.PersistentFlags().Lookup("secretKey").Value.String()
-	CrossAccountRoleArn = cmd.PersistentFlags().Lookup("crossAccountRoleArn").Value.String()
-	ExternalId = cmd.PersistentFlags().Lookup("externalId").Value.String()
+	ClientAuth = client.Auth{
+		cmd.PersistentFlags().Lookup("zone").Value.String(),
+		cmd.PersistentFlags().Lookup("crossAccountRoleArn").Value.String(),
+		cmd.PersistentFlags().Lookup("accessKey").Value.String(),
+		cmd.PersistentFlags().Lookup("secretKey").Value.String(),
+		cmd.PersistentFlags().Lookup("externalId").Value.String(),
+	}
 
-	authFlag := AuthenticateData(VaultUrl, AccountId, Region, AcKey, SecKey, CrossAccountRoleArn, ExternalId)
+	authFlag := AuthenticateData("", "", ClientAuth.Region, ClientAuth.AccessKey, ClientAuth.SecretKey, ClientAuth.CrossAccountRoleArn, ClientAuth.ExternalId)
 
+	return authFlag
+}
+
+// ApiAuth -> for authentication of api request
+func ApiAuth(auth client.Auth) bool {
+
+	authFlag := AuthenticateData("", "", auth.Region, auth.AccessKey, auth.SecretKey, auth.CrossAccountRoleArn, auth.ExternalId)
+
+	if !authFlag {
+		log.Fatalln("authentication error")
+	}
 	return authFlag
 }

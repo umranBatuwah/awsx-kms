@@ -12,7 +12,6 @@ type Response struct {
 	AccessKey           string `json:"accessKey,omitempty"`
 	SecretKey           string `json:"secretKey,omitempty"`
 	CrossAccountRoleArn string `json:"crossAccountRoleArn,omitempty"`
-	ExternalId          string `json:"externalId,omitempty"`
 }
 
 func GetAccountDetails(vaultUrl string, accountNo string) (*Response, error) {
