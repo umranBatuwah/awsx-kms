@@ -25,6 +25,8 @@ func KMSDetail(kmsClient *kms.KMS, keyId string) *kms.DescribeKeyOutput {
 	}
 
 	log.Println(kmsResponse)
+	log.Println(kmsResponse)
+
 
 	return kmsResponse
 }
